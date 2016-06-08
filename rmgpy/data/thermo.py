@@ -513,6 +513,7 @@ class ThermoDatabase(object):
         self.groups['radical'] = ThermoGroups(label='radical').load(os.path.join(path, 'radical.py'), self.local_context, self.global_context)
         self.groups['polycyclic'] = ThermoGroups(label='polycyclic').load(os.path.join(path, 'polycyclic.py'), self.local_context, self.global_context)
         self.groups['other']   =   ThermoGroups(label='other').load(os.path.join(path, 'other.py'  ), self.local_context, self.global_context)
+        self.groups['aromaticsNNI']   =   ThermoGroups(label='aromaticsNNI').load(os.path.join(path, 'aromaticsNNI.py'  ), self.local_context, self.global_context)
 
     def save(self, path):
         """
@@ -1202,6 +1203,20 @@ class ThermoDatabase(object):
                     logging.error(molecule)
                     logging.error(molecule.toAdjacencyList())
                     raise
+
+        # Add NNI corrections for Aromatics
+        if molecule.isAromatic():
+            for atom_1 in molecule.atoms:
+                if atom_1.atomType.label == 'Cb':
+                    for atom_2 in molecule.atoms:
+                        molecule.clearLabeledAtoms()
+                        atom_1.label = '*'
+                        if atom_2.atomType.label == 'Cb' and atom_2.label !='*':
+                            atoms = {'*1':atom_1, '*2':atom_2}
+                            molecule.clearLabeledAtoms()
+                            try:
+                                self.__addGroupThermoData(thermoData, self.groups['aromaticsNNI'], molecule, atoms)
+                            except KeyError: pass
 
         return thermoData
 
