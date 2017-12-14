@@ -585,6 +585,7 @@ cdef class ReactionSystem(DASx):
         for index, spec in enumerate(coreSpecies):
             speciesIndex[spec] = index
         
+        print 'Initialize Model...'
         self.initializeModel(coreSpecies, coreReactions, edgeSpecies, edgeReactions, surfaceSpecies, surfaceReactions, 
                              pdepNetworks, absoluteTolerance, relativeTolerance, sensitivity, sensitivityAbsoluteTolerance, 
                              sensitivityRelativeTolerance, filterReactions)
@@ -633,10 +634,11 @@ cdef class ReactionSystem(DASx):
         prevTime = self.t
 
         firstTime = True
-        
+        print 'Start Iterating...'
         while not terminated:
             # Integrate forward in time by one time step
-            
+            print '{:.2E}'.format(self.t)
+            print '{:.2E}'.format(stepTime)
             if not firstTime:
                 try:
                     self.step(stepTime)
@@ -676,7 +678,7 @@ cdef class ReactionSystem(DASx):
                         logging.error("Edge species net rates: {!r}".format(self.edgeSpeciesRates))
                         logging.error("Network leak rates: {!r}".format(self.networkLeakRates))
                         raise ValueError('invalidObjects could not be filled during resurrection process')
-            
+            print 'Finish step...Start sensitivity...'
             y_coreSpecies = self.y[:numCoreSpecies]
             totalMoles = numpy.sum(y_coreSpecies)
             if sensitivity:

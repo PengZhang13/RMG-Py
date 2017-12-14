@@ -30,10 +30,14 @@ import copy
 import numpy
 from rmgpy.tools.canteraModel import Cantera
 try:
-    #import muq.libmuqModelling
+#    import muq.libmuqModelling as libmuqModelling
+#    import muq.libmuqUtilities as libmuqUtilities
+#    import muq.libmuqApproximation as libmuqApproximation
+#    from libmuqModelling import ModPiece
+#    from libmuqUtilities import LegendrePolynomials1DRecursive, GaussPattersonQuadrature1D, VariableCollection
+#    from libmuqApproximation import SmolyakPCEFactory
+
     from libmuqModelling import ModPiece
-    #import muq.libmuqUtilities as libmuqUtilities
-    #import muq.libmuqApproximation as libmuqApproximation
     from libmuqUtilities import LegendrePolynomials1DRecursive, GaussPattersonQuadrature1D, VariableCollection
     from libmuqApproximation import SmolyakPCEFactory
 except:

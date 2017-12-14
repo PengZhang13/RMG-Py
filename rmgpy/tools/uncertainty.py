@@ -339,6 +339,7 @@ class Uncertainty:
         saturatedStruct.saturate()
         for otherSpecies in self.speciesList:
             if otherSpecies.isIsomorphic(saturatedStruct):
+                print 'LENS of SPECIES LIST', len(self.speciesList)
                 return otherSpecies, False
         
         #couldn't find saturated species in the model, try libraries
@@ -348,6 +349,7 @@ class Uncertainty:
         if thermo is not None:
             newSpc.thermo = thermo
             self.speciesList.append(newSpc)
+            print 'LENS of SPECIES LIST', len(self.speciesList)
             return newSpc, True
         else:         
             raise Exception('Could not retrieve saturated species form of {0} from the species list'.format(species))
@@ -382,12 +384,14 @@ class Uncertainty:
                         
                     if 'Library' in source:
                         source['Library'] = self.speciesList.index(saturatedSpecies)
+                        print source['Library'], len(self.speciesList)
                     if 'QM' in source:
                         source['QM'] = self.speciesList.index(saturatedSpecies)
                 else:
                     raise Exception('Source of thermo should not use more than two sources out of QM, Library, or GAV.')
                 
                 self.speciesSourcesDict[species] = source
+        print len(self.speciesList)
         
         self.reactionSourcesDict = {}
         for reaction in self.reactionList:
@@ -411,6 +415,7 @@ class Uncertainty:
         
         for spc in ignoreSpcs:
             self.speciesList.remove(spc)
+        
             
     def compileAllSources(self):
         """
@@ -504,8 +509,13 @@ class Uncertainty:
                 source = self.speciesSourcesDict[species]
                 dG = {}
                 if 'Library' in source:
+                    print species
+                    print source
+                    print len(self.speciesList)
                     pdG = gParamEngine.getPartialUncertaintyValue(source, 'Library', corrParam=source['Library'])
+                    print pdG
                     label = 'Library {}'.format(self.speciesList[source['Library']].toChemkin())
+                    print label
                     dG[label] = pdG
                 if 'QM' in source:
                     pdG = gParamEngine.getPartialUncertaintyValue(source, 'QM',corrParam=source['QM'])
@@ -605,7 +615,7 @@ class Uncertainty:
         reactionSystem.attach(SimulationProfilePlotter(
             self.outputDirectory, reactionSystemIndex, self.speciesList))
         
-        simulatorSettings = SimulatorSettings() #defaults
+        simulatorSettings = SimulatorSettings(atol=1e-16, rtol=1e-8, sens_atol=1e-6, sens_rtol=1e-4) #defaults
         
         modelSettings = ModelSettings() #defaults
         modelSettings.fluxToleranceMoveToCore = 0.1
